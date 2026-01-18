@@ -1,0 +1,10 @@
+[package]
+name = "libsirt"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+logos = "0.16.0"
+pest = "2.8.5"
+pest_derive = "2.8.5"
+serde = { version = "1.0.228", features = ["derive"] }

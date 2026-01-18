@@ -1,0 +1,9 @@
+Person {
+    name: text("Jack")
+    age: int(10)
+    canFly: bool(false)
+}
+
+Second {
+    more: text("hello world")
+}

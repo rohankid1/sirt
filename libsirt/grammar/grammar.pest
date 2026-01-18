@@ -1,0 +1,16 @@
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+
+input = { SOI ~ block* ~ EOI }
+block = { ident ~ "{" ~ field* ~ "}" }
+
+field =  { ident ~ ":" ~ value }
+value = _{ text | int | bool }
+
+text = { "text" ~ "(" ~ string ~ ")" }
+int  = { "int" ~ "(" ~ number ~ ")" }
+bool = { "bool" ~ "(" ~ ("true" | "false" | "yes" | "no") ~ ")" }
+
+// basic types
+ident  = @{ ASCII_ALPHA+ }
+string = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+number = @{ "-"? ~ ASCII_DIGIT+ }
