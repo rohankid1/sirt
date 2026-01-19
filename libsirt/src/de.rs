@@ -170,3 +170,20 @@ where
     let des = BlockDeserializer { block };
     T::deserialize(des)
 }
+
+pub fn from_str_named_iter<T>(
+    input: &str,
+    name: &str,
+) -> Result<impl Iterator<Item = Result<T, SirtDeserializeError>>, SirtDeserializeError>
+where
+    T: for<'de> Deserialize<'de>,
+{
+    let blocks = parse_input(input).map_err(|err| {
+        SirtDeserializeError::custom(format!("failed to parse sirt format: '{err:?}'"))
+    })?;
+
+    Ok(blocks
+        .into_iter()
+        .filter(move |block| block.get_name() == name)
+        .map(|block| T::deserialize(BlockDeserializer { block: &block })))
+}

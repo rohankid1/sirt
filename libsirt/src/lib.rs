@@ -5,7 +5,7 @@ mod parser;
 use pest_derive::Parser;
 use std::collections::HashMap;
 
-pub use de::{from_str, from_str_named};
+pub use de::{from_str, from_str_named, from_str_named_iter};
 pub use parser::parse_input;
 
 #[derive(Parser)]
