@@ -1,4 +1,4 @@
-use serde::de;
+use serde::{de, ser};
 use std::error::Error;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -47,3 +47,23 @@ impl std::fmt::Display for SirtDeserializeError {
 }
 
 impl Error for SirtDeserializeError {}
+
+#[derive(Debug, Clone)]
+pub struct SirtSerializeError(String);
+
+impl ser::Error for SirtSerializeError {
+    fn custom<T>(msg: T) -> Self
+    where
+        T: std::fmt::Display,
+    {
+        Self(msg.to_string())
+    }
+}
+
+impl std::fmt::Display for SirtSerializeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl Error for SirtSerializeError {}
