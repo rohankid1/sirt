@@ -12,7 +12,7 @@ pub use parser::parse_input;
 #[grammar = "../grammar/grammar.pest"]
 pub(crate) struct SirtParser;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Value {
     Text(String),
     Int(i64),
@@ -20,7 +20,7 @@ pub enum Value {
     End,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Block {
     name: String,
     fields: HashMap<String, Value>,
