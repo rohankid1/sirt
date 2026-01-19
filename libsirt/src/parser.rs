@@ -66,3 +66,88 @@ fn parse_value(pair: Pair<'_, Rule>) -> Result<Value, ParseError<'_>> {
         _ => unreachable!(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_input_with_empty_blocks() {
+        let input = r#"
+            Person {}
+        "#;
+        let input2 = r#"
+            One {}
+            Two {}
+            Three {}
+            "#;
+
+        let parser = parse_input(input);
+        let parser2 = parse_input(input2);
+
+        assert!(parser.is_ok());
+        assert!(parser2.is_ok());
+
+        let mut block1 = parser.unwrap().into_iter();
+        let mut block2 = parser2.unwrap().into_iter();
+
+        assert_eq!(
+            block1.next(),
+            Some(Block {
+                name: "Person".to_owned(),
+                fields: HashMap::default()
+            })
+        );
+
+        assert_eq!(block1.next(), None);
+
+        assert_eq!(
+            block2.next(),
+            Some(Block {
+                name: "One".to_owned(),
+                fields: HashMap::default()
+            })
+        );
+
+        assert_eq!(
+            block2.next(),
+            Some(Block {
+                name: "Two".to_owned(),
+                fields: HashMap::default()
+            })
+        );
+
+        assert_eq!(
+            block2.next(),
+            Some(Block {
+                name: "Three".to_owned(),
+                fields: HashMap::default()
+            })
+        );
+
+        assert_eq!(block2.next(), None);
+    }
+
+    #[test]
+    fn test_input_with_fields() {
+        let input = "App { isRunning: bool(false) num: int(64) }";
+        let parser = parse_input(input);
+
+        assert!(parser.is_ok());
+
+        let mut iter = parser.unwrap().into_iter();
+
+        assert_eq!(
+            iter.next(),
+            Some(Block {
+                name: "App".to_string(),
+                fields: HashMap::from([
+                    ("isRunning".to_owned(), Value::Bool(false)),
+                    ("num".to_string(), Value::Int(64))
+                ])
+            })
+        );
+
+        assert!(iter.next().is_none());
+    }
+}
