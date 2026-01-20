@@ -10,6 +10,10 @@ readme = "README.md"
 keywords = ["parser", "sirt"]
 categories = ["parser-implementations"]
 
+exclude = [
+    "tests/*"
+]
+
 [dependencies]
 pest = "2.8.5"
 pest_derive = "2.8.5"
