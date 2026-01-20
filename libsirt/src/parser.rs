@@ -57,10 +57,8 @@ fn parse_value(pair: Pair<'_, Rule>) -> Result<Value, ParseError<'_>> {
             let s: &String = &s[5..].chars().take_while(|c| *c != ')').collect();
 
             match s.as_str() {
-                "true" => Ok(Value::Bool(true)),
-                "false" => Ok(Value::Bool(false)),
-                "yes" => Ok(Value::Bool(true)),
-                "no" => Ok(Value::Bool(false)),
+                "true" | "yes" => Ok(Value::Bool(true)),
+                "false" | "no" => Ok(Value::Bool(false)),
                 _ => Err(ParseError::Other("bool parse error")),
             }
         }
