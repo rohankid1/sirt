@@ -1,4 +1,5 @@
 use crate::error::ParseError;
+use crate::types::List;
 use crate::{Block, Rule, SirtParser, Value};
 
 use pest::Parser;
@@ -63,13 +64,29 @@ fn parse_value(pair: Pair<'_, Rule>) -> Result<Value, ParseError<'_>> {
                 _ => Err(ParseError::Other("bool parse error")),
             }
         }
+        Rule::list => Ok(Value::List(parse_list(pair)?)),
         _ => unreachable!(),
     }
+}
+
+fn parse_list(pair: Pair<'_, Rule>) -> Result<List<Value>, ParseError<'_>> {
+    let mut list = List::with_capacity(1);
+
+    for inner in pair.into_inner() {
+        if inner.as_rule() == Rule::value_list {
+            for v in inner.into_inner() {
+                list.push(parse_value(v)?);
+            }
+        }
+    }
+
+    Ok(list)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use Value::*;
 
     #[test]
     fn test_input_with_empty_blocks() {
@@ -149,5 +166,26 @@ mod tests {
         );
 
         assert!(iter.next().is_none());
+    }
+
+    #[test]
+    fn test_list() {
+        let input = r#"NumList { arr: list(int(1), int(2), int(3)) }"#;
+        let parser = parse_input(input);
+
+        assert!(parser.is_ok());
+
+        let mut iter = parser.unwrap().into_iter();
+
+        assert_eq!(
+            iter.next(),
+            Some(Block {
+                name: "NumList".to_string(),
+                fields: HashMap::from([(
+                    "arr".to_string(),
+                    Value::List(vec![Int(1), Int(2), Int(3)])
+                )])
+            })
+        );
     }
 }

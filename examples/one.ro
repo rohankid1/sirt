@@ -1,7 +1,6 @@
-Person {
-    name: text("Jack")
-    age: int(10)
-    canFly: bool(false)
+Thing {
+    a: list(text("hi"), text("a"))
+    b: list(int(10), int(56), int(23), int(67))
 }
 
 Second {

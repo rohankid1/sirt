@@ -1,28 +1,18 @@
 use libsirt::types::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
-struct LongBlock {
-    one: Int,
-    two: Bool,
-    three: String,
-    four: Bool,
-    five: Bool,
+const FILE: &'static str = include_str!("../../examples/one.ro");
+
+#[derive(Debug, Deserialize, Serialize)]
+struct Thing {
+    a: Vec<String>,
+    b: Vec<Int>,
 }
 
 fn main() {
-    let i = r#"
-        LongBlock {
-            one: int(1)
-            two: bool(true)
-            three: text("hello")
-            four: bool(yes)
-            five: bool(no)
-        }
-"#;
-
-    let a: Result<LongBlock, _> = libsirt::from_str(i);
-    let m = a.unwrap();
-    dbg!(&m);
-    println!("{}", libsirt::to_pretty_string("LongBlock", &m).unwrap());
+    let a: Thing = libsirt::from_str_named(FILE, "Thing").unwrap();
+    println!("{:?}", a.a);
+    let a = libsirt::to_pretty_string("Thing", &a).unwrap();
+    println!("{a}");
+    println!("{:?}", libsirt::from_str::<Thing>(&a).unwrap());
 }

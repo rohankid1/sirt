@@ -1,8 +1,29 @@
 use serde::Deserialize;
-use serde::de::{self, Deserializer, Error, IntoDeserializer, MapAccess, Visitor};
+use serde::de::{self, Deserializer, Error, IntoDeserializer, MapAccess, SeqAccess, Visitor};
 
 use crate::error::SirtDeserializeError;
 use crate::{Block, Value, parse_input};
+
+struct ListAccess<'a> {
+    iter: std::slice::Iter<'a, Value>,
+}
+
+impl<'a, 'de> SeqAccess<'de> for ListAccess<'a> {
+    type Error = SirtDeserializeError;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    where
+        T: de::DeserializeSeed<'de>,
+    {
+        match self.iter.next() {
+            Some(value) => {
+                let de = ValueDeserializer { value };
+                seed.deserialize(de).map(Some)
+            }
+            None => Ok(None),
+        }
+    }
+}
 
 struct BlockMapAccess<'a> {
     iter: std::collections::hash_map::Iter<'a, String, Value>,
@@ -87,11 +108,16 @@ struct ValueDeserializer<'a> {
 impl<'de, 'a> Deserializer<'de> for ValueDeserializer<'a> {
     type Error = SirtDeserializeError;
 
-    fn deserialize_any<V>(self, _: V) -> Result<V::Value, Self::Error>
+    fn deserialize_any<V>(self, v: V) -> Result<V::Value, Self::Error>
     where
         V: Visitor<'de>,
     {
-        unreachable!()
+        match self.value {
+            Value::List(_) => self.deserialize_seq(v),
+            Value::Bool(_) => self.deserialize_bool(v),
+            Value::Int(_) => self.deserialize_i64(v),
+            Value::Text(_) => self.deserialize_string(v),
+        }
     }
 
     fn deserialize_string<V>(self, visitor: V) -> Result<V::Value, Self::Error>
@@ -130,11 +156,22 @@ impl<'de, 'a> Deserializer<'de> for ValueDeserializer<'a> {
         }
     }
 
+    fn deserialize_seq<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: Visitor<'de>,
+    {
+        match self.value {
+            Value::List(list) => visitor.visit_seq(ListAccess { iter: list.iter() }),
+            other => Err(SirtDeserializeError::custom(format!(
+                "expected list, found {other:?}"
+            ))),
+        }
+    }
+
     serde::forward_to_deserialize_any! {
         i8 i16 i32 i128 u8 u16 u32 u64 u128 f32 f64 char str
         bytes byte_buf option unit unit_struct newtype_struct
-        tuple_struct map struct enum identifier ignored_any seq
-        tuple
+        tuple_struct map struct enum identifier ignored_any tuple
     }
 }
 

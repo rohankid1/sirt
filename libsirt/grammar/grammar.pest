@@ -4,11 +4,13 @@ input = { SOI ~ block* ~ EOI }
 block = { ident ~ "{" ~ field* ~ "}" }
 
 field =  { ident ~ ":" ~ value }
-value = _{ text | int | bool }
+value = _{ text | int | bool | list }
 
-text = { "text" ~ "(" ~ string ~ ")" }
-int  = { "int" ~ "(" ~ number ~ ")" }
-bool = { "bool" ~ "(" ~ ("true" | "false" | "yes" | "no") ~ ")" }
+text       = { "text" ~ "(" ~ string ~ ")" }
+int        = { "int" ~ "(" ~ number ~ ")" }
+bool       = { "bool" ~ "(" ~ ("true" | "false" | "yes" | "no") ~ ")" }
+list       = { "list" ~ "(" ~ value_list? ~ ")" }
+value_list = { value ~ ("," ~ value)* }
 
 // basic types
 ident  = @{ ASCII_ALPHA+ }

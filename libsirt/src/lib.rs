@@ -19,13 +19,14 @@ pub enum Value {
     Text(String),
     Int(i64),
     Bool(bool),
-    End,
+    List(Vec<Value>),
 }
 
 pub mod types {
     pub type Int = i64;
     pub type Bool = bool;
     pub type Text = String;
+    pub type List<T> = Vec<T>;
 }
 
 #[derive(Debug, PartialEq)]

@@ -1,7 +1,7 @@
 use crate::error::SirtSerializeError;
 use serde::{
     Serialize,
-    ser::{self, Impossible, SerializeStruct},
+    ser::{self, Impossible, SerializeSeq, SerializeStruct},
 };
 
 pub struct SirtSerializer {
@@ -27,8 +27,48 @@ impl SirtSerializer {
         self.output
     }
 
-    fn newline(&mut self) {
-        self.output.push('\n');
+    fn pretty_newline(&mut self) {
+        if self.prettify {
+            self.output.push('\n');
+        }
+    }
+
+    fn pretty_indent(&mut self, n: usize) {
+        if self.prettify {
+            self.output.push_str(&"\t".repeat(n));
+        }
+    }
+}
+
+pub struct SirtListSerializer<'a> {
+    ser: &'a mut SirtSerializer,
+    first: bool,
+}
+
+impl<'a> SerializeSeq for SirtListSerializer<'a> {
+    type Ok = ();
+    type Error = SirtSerializeError;
+
+    fn serialize_element<T>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: ?Sized + Serialize,
+    {
+        if !self.first {
+            self.ser.output.push_str(", ");
+            self.ser.pretty_newline();
+        }
+        self.first = false;
+
+        self.ser.pretty_indent(2);
+        value.serialize(&mut *self.ser)?;
+        Ok(())
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        self.ser.pretty_newline();
+        self.ser.pretty_indent(1);
+        self.ser.output.push(')');
+        Ok(())
     }
 }
 
@@ -44,14 +84,10 @@ impl<'a> SerializeStruct for SirtStructSerializer<'a> {
     where
         T: ?Sized + Serialize,
     {
-        self.ser.output.push_str(&format!(
-            "{}{key}: ",
-            if self.ser.prettify { "\t" } else { "" }
-        ));
+        self.ser.pretty_indent(1);
+        self.ser.output.push_str(&format!("{key}: "));
         value.serialize(&mut *self.ser)?;
-        if self.ser.prettify {
-            self.ser.newline();
-        }
+        self.ser.pretty_newline();
         self.ser.output.push(' ');
         Ok(())
     }
@@ -65,8 +101,8 @@ impl<'a> ser::Serializer for &'a mut SirtSerializer {
     type Error = SirtSerializeError;
     type Ok = ();
     type SerializeStruct = SirtStructSerializer<'a>;
+    type SerializeSeq = SirtListSerializer<'a>;
     type SerializeMap = Impossible<(), SirtSerializeError>;
-    type SerializeSeq = Impossible<(), SirtSerializeError>;
     type SerializeStructVariant = Impossible<(), SirtSerializeError>;
     type SerializeTuple = Impossible<(), SirtSerializeError>;
     type SerializeTupleStruct = Impossible<(), SirtSerializeError>;
@@ -96,7 +132,16 @@ impl<'a> ser::Serializer for &'a mut SirtSerializer {
     }
 
     fn serialize_seq(self, _: Option<usize>) -> Result<Self::SerializeSeq, Self::Error> {
-        unimplemented!()
+        let state = true;
+        self.output.push_str("list(");
+        self.pretty_newline();
+        if !state {
+            self.pretty_indent(2);
+        }
+        Ok(SirtListSerializer {
+            ser: self,
+            first: state,
+        })
     }
 
     fn serialize_tuple(self, _: usize) -> Result<Self::SerializeTuple, Self::Error> {
@@ -136,30 +181,6 @@ impl<'a> ser::Serializer for &'a mut SirtSerializer {
     }
 
     fn serialize_bytes(self, _: &[u8]) -> Result<Self::Ok, Self::Error> {
-        unimplemented!()
-    }
-
-    fn collect_map<K, V, I>(self, _: I) -> Result<Self::Ok, Self::Error>
-    where
-        K: Serialize,
-        V: Serialize,
-        I: IntoIterator<Item = (K, V)>,
-    {
-        unimplemented!()
-    }
-
-    fn collect_seq<I>(self, _: I) -> Result<Self::Ok, Self::Error>
-    where
-        I: IntoIterator,
-        <I as IntoIterator>::Item: Serialize,
-    {
-        unimplemented!()
-    }
-
-    fn collect_str<T>(self, _: &T) -> Result<Self::Ok, Self::Error>
-    where
-        T: ?Sized + std::fmt::Display,
-    {
         unimplemented!()
     }
 
