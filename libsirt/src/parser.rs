@@ -9,7 +9,8 @@ use std::collections::HashMap;
 pub fn parse_input(input: &str) -> Result<Vec<Block>, ParseError<'_>> {
     let mut blocks = Vec::new();
 
-    let mut pairs = SirtParser::parse(Rule::input, input).map_err(|_| ParseError::Input)?;
+    let mut pairs =
+        SirtParser::parse(Rule::input, input).map_err(|e| ParseError::Input(e.to_string()))?;
 
     if let Some(pairs) = pairs.next() {
         for pair in pairs.into_inner() {

@@ -3,7 +3,7 @@ use std::error::Error;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParseError<'a> {
-    Input,
+    Input(String),
     Block,
     Value,
     Field,
@@ -18,7 +18,7 @@ impl<'a> std::fmt::Display for ParseError<'a> {
             f,
             "{}",
             match self {
-                ParseError::Input => "Input",
+                ParseError::Input(i) => i,
                 ParseError::Block => "Block",
                 ParseError::Value => "Value",
                 ParseError::Field => "Field",
