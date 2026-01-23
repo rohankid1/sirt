@@ -14,7 +14,7 @@ pub use se::{to_pretty_string, to_string};
 #[grammar = "../grammar/grammar.pest"]
 pub(crate) struct SirtParser;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Value {
     Text(String),
     Int(i64),
@@ -29,7 +29,7 @@ pub mod types {
     pub type List<T> = Vec<T>;
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Block {
     name: String,
     fields: HashMap<String, Value>,
