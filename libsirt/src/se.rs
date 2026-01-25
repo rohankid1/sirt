@@ -281,6 +281,11 @@ impl<'a> ser::Serializer for &'a mut SirtSerializer {
     }
 }
 
+/// Serializes an object into string representation.
+///
+/// # Note
+/// This does not return a prettified string, use
+/// [to_pretty_string] for this.
 pub fn to_string<T>(name: &str, value: &T) -> Result<String, SirtSerializeError>
 where
     T: Serialize,
@@ -290,6 +295,7 @@ where
     Ok(s.complete())
 }
 
+/// Same as [to_string], but returns a prettified version.
 pub fn to_pretty_string<T>(name: &str, value: &T) -> Result<String, SirtSerializeError>
 where
     T: Serialize,

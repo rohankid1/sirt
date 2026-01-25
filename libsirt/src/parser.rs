@@ -6,6 +6,18 @@ use pest::Parser;
 use pest::iterators::Pair;
 use std::collections::HashMap;
 
+/// Break the input down into multiple Blocks.
+///
+/// Unless for a specific need, users of the
+/// library should prefer [crate::from_str],
+/// [crate::from_str_named], and/or
+/// [crate::from_str_named_iter] for deserialization,
+/// and [crate::to_string] and/or [crate::to_pretty_string]
+/// for serialization.
+///
+/// # Error
+/// If an error is encountered by the parser,
+/// it will return an Err([crate::error::ParseError]).
 pub fn parse_input(input: &str) -> Result<Vec<Block>, ParseError<'_>> {
     let mut blocks = Vec::new();
 

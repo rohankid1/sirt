@@ -1,6 +1,9 @@
 use serde::{de, ser};
 use std::error::Error;
 
+/// An error representing possible
+/// values that the parser could
+/// return.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParseError<'a> {
     Input(String),
