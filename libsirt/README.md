@@ -40,7 +40,7 @@ let file = "..."; // loaded from file
 let app: Result<App, _> = from_str::<App>(file);
 let app = app.unwrap();
 
+assert!(app.use_native_title_bar);
 assert_eq!(app.title, "Sirt".to_string());
-assert_eq!(app.use_native_title_bar, true);
 assert_eq!(app.features, vec!["featureOne".to_string(), "featureTwo".to_string(), "featureThree".to_string()]);
 ```
