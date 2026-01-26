@@ -10,6 +10,8 @@ pub enum ParseError<'a> {
     Block,
     Value,
     Field,
+    Int(String),
+    Bool(String),
     Other(&'a str),
 }
 
@@ -25,6 +27,7 @@ impl<'a> std::fmt::Display for ParseError<'a> {
                 ParseError::Block => "Block",
                 ParseError::Value => "Value",
                 ParseError::Field => "Field",
+                ParseError::Int(msg) | ParseError::Bool(msg) => msg,
                 ParseError::Other(reason) => reason,
             }
         )

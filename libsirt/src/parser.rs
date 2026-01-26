@@ -60,19 +60,21 @@ fn parse_value(pair: Pair<'_, Rule>) -> Result<Value, ParseError<'_>> {
         }
         Rule::int => {
             let s = pair.into_inner().next().ok_or(ParseError::Value)?.as_str();
-            let n: i64 = s
-                .parse()
-                .map_err(|_| ParseError::Other("i64 parse error"))?;
+            let n: i64 = s.parse().map_err(|err: std::num::ParseIntError| {
+                ParseError::Int(format!("value '{s}':\n{}", err))
+            })?;
             Ok(Value::Int(n))
         }
         Rule::bool => {
             let s = pair.as_str();
             let s: &String = &s[5..].chars().take_while(|c| *c != ')').collect();
 
-            match s.as_str() {
+            match s.as_str().trim() {
                 "true" | "yes" => Ok(Value::Bool(true)),
                 "false" | "no" => Ok(Value::Bool(false)),
-                _ => Err(ParseError::Other("bool parse error")),
+                other => Err(ParseError::Bool(format!(
+                    "value '{other}':\nexpected boolean value from: [true, false, yes, no]"
+                ))),
             }
         }
         Rule::list => Ok(Value::List(parse_list(pair)?)),
