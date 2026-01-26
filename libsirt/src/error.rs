@@ -1,12 +1,17 @@
 use serde::{de, ser};
 use std::error::Error;
 
+/// An error representing possible
+/// values that the parser could
+/// return.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ParseError<'a> {
     Input(String),
     Block,
     Value,
     Field,
+    Int(String),
+    Bool(String),
     Other(&'a str),
 }
 
@@ -22,6 +27,7 @@ impl<'a> std::fmt::Display for ParseError<'a> {
                 ParseError::Block => "Block",
                 ParseError::Value => "Value",
                 ParseError::Field => "Field",
+                ParseError::Int(msg) | ParseError::Bool(msg) => msg,
                 ParseError::Other(reason) => reason,
             }
         )

@@ -1,0 +1,31 @@
+# An example package configuration
+# Comments are supported
+
+# If you have the sirt executable installed,
+# try running `sirt file /path/to/this/file.sirt gui`
+# to analyze the blocks and see how it is
+# represented in Rust code!
+
+# denote a Block
+Package {
+    # below is a comment so it'll be ignored by the parser
+    # temp: int(10)
+
+    # Field: Value
+    name: text("Sirt") # inline comment
+    authors: list(
+        text("Author A"),
+        text("Author B")
+    )
+    description: text("An application that analyzes Sirt Blocks")
+    lib: bool(false) # supported bool values: true, false, yes, no
+}
+
+Dependencies {
+    names: list(text("dep_a"), text("dep_b"))
+}
+
+Dependency {
+    name: text("libsirt")
+    alias: text("ls")
+}

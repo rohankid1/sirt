@@ -15,7 +15,7 @@ and also represent the data structure into text.
 # Example
 An example of how a Sirt format is structured can be seen below:
 
-```toml
+```
 App {
     title: text("Sirt")
     useNativeTitleBar: bool(true)
@@ -24,7 +24,7 @@ App {
 ```
 
 in application code:
-```rs
+```
 use serde::{Deserialize, Serialize};
 use libsirt::{types::*, from_str};
 

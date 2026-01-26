@@ -175,6 +175,8 @@ impl<'de, 'a> Deserializer<'de> for ValueDeserializer<'a> {
     }
 }
 
+/// Deserialize string representation of data into an
+/// object instance of type `T`.
 pub fn from_str<'de, T>(input: &str) -> Result<T, SirtDeserializeError>
 where
     T: Deserialize<'de>,
@@ -183,7 +185,7 @@ where
         SirtDeserializeError::custom(format!("failed to parse sirt format: {err:?}"))
     })?;
 
-    if blocks.len() < 1 {
+    if blocks.is_empty() {
         return Err(SirtDeserializeError::custom("expected at least one block"));
     }
 
@@ -192,6 +194,8 @@ where
     T::deserialize(des)
 }
 
+/// Same as [from_str], but returns the first [Block]
+/// that matches the given name.
 pub fn from_str_named<'de, T>(input: &str, name: &str) -> Result<T, SirtDeserializeError>
 where
     T: Deserialize<'de>,
@@ -208,6 +212,8 @@ where
     T::deserialize(des)
 }
 
+/// Similar to [from_str_named_iter] but returns every instance
+/// that matches the name as an iterator.
 pub fn from_str_named_iter<T>(
     input: &str,
     name: &str,
