@@ -15,7 +15,7 @@ impl SirtSerializer {
         output.push_str(&format!("{name} {{ "));
 
         if prettify {
-            output.push_str("\n");
+            output.push('\n');
         }
 
         Self { output, prettify }
