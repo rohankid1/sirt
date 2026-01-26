@@ -9,7 +9,7 @@ value = _{ text | int | bool | list }
 
 text       = { "text" ~ "(" ~ string ~ ")" }
 int        = { "int" ~ "(" ~ number ~ ")" }
-bool       = { "bool" ~ "(" ~ ("true" | "false" | "yes" | "no") ~ ")" }
+bool       = { "bool" ~ "(" ~ ident ~ ")" }
 list       = { "list" ~ "(" ~ value_list? ~ ")" }
 value_list = { value ~ ("," ~ value)* }
 
