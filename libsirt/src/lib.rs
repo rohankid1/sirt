@@ -21,7 +21,8 @@ pub(crate) struct SirtParser;
 #[derive(Debug, PartialEq, Clone)]
 pub enum Value {
     Text(String),
-    Int(i64),
+    Int(types::Int),
+    Float(types::Float),
     Bool(bool),
     List(Vec<Value>),
 }
@@ -32,11 +33,13 @@ pub enum Value {
 /// types.
 pub mod types {
     pub type Int = i64;
+    pub type Float = f64;
     pub type Bool = bool;
     pub type Text = String;
     pub type List<T> = Vec<T>;
     pub type ListText = Vec<String>;
     pub type ListInt = Vec<Int>;
+    pub type ListFloat = Vec<Float>;
     pub type ListBool = Vec<bool>;
 }
 

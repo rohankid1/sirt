@@ -41,6 +41,7 @@ pub fn infer_type_str(ty: &Value) -> String {
     match ty {
         Value::Bool(_) => "bool".into(),
         Value::Int(_) => "i64".into(),
+        Value::Float(_) => "f64".into(),
         Value::Text(_) => "String".into(),
         Value::List(l) => {
             let mut output = String::from("Vec<");

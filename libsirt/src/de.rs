@@ -116,6 +116,7 @@ impl<'de, 'a> Deserializer<'de> for ValueDeserializer<'a> {
             Value::List(_) => self.deserialize_seq(v),
             Value::Bool(_) => self.deserialize_bool(v),
             Value::Int(_) => self.deserialize_i64(v),
+            Value::Float(_) => self.deserialize_f64(v),
             Value::Text(_) => self.deserialize_string(v),
         }
     }
@@ -140,6 +141,18 @@ impl<'de, 'a> Deserializer<'de> for ValueDeserializer<'a> {
             Value::Int(num) => visitor.visit_i64(*num),
             other => Err(SirtDeserializeError::custom(format!(
                 "expected i64, found {other:?}"
+            ))),
+        }
+    }
+
+    fn deserialize_f64<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: Visitor<'de>,
+    {
+        match self.value {
+            Value::Float(f) => visitor.visit_f64(*f),
+            other => Err(SirtDeserializeError::custom(format!(
+                "expected f64, found {other:?}"
             ))),
         }
     }
@@ -169,7 +182,7 @@ impl<'de, 'a> Deserializer<'de> for ValueDeserializer<'a> {
     }
 
     serde::forward_to_deserialize_any! {
-        i8 i16 i32 i128 u8 u16 u32 u64 u128 f32 f64 char str
+        i8 i16 i32 i128 u8 u16 u32 u64 u128 f32 char str
         bytes byte_buf option unit unit_struct newtype_struct
         tuple_struct map struct enum identifier ignored_any tuple
     }
