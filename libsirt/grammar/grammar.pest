@@ -5,10 +5,11 @@ input = { SOI ~ block* ~ EOI }
 block = { ident ~ "{" ~ field* ~ "}" }
 
 field =  { ident ~ ":" ~ value }
-value = _{ text | int | bool | list }
+value = _{ text | int | float | bool | list }
 
 text       = { "text" ~ "(" ~ string ~ ")" }
 int        = { "int" ~ "(" ~ number ~ ")" }
+float      = { "float" ~ "(" ~ number ~ "." ~ number? ~ ")" }
 bool       = { "bool" ~ "(" ~ ident ~ ")" }
 list       = { "list" ~ "(" ~ value_list? ~ ")" }
 value_list = { value ~ ("," ~ value)* }

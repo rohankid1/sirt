@@ -58,13 +58,8 @@ fn parse_value(pair: Pair<'_, Rule>) -> Result<Value, ParseError<'_>> {
             let txt = s[1..s.len() - 1].to_string();
             Ok(Value::Text(txt))
         }
-        Rule::int => {
-            let s = pair.into_inner().next().ok_or(ParseError::Value)?.as_str();
-            let n: i64 = s.parse().map_err(|err: std::num::ParseIntError| {
-                ParseError::Int(format!("value '{s}':\n{}", err))
-            })?;
-            Ok(Value::Int(n))
-        }
+        Rule::int => Ok(parse_int(pair)?),
+        Rule::float => Ok(parse_float(pair)?),
         Rule::bool => {
             let s = pair.as_str();
             let s: &String = &s[5..].chars().take_while(|c| *c != ')').collect();
@@ -94,6 +89,22 @@ fn parse_list(pair: Pair<'_, Rule>) -> Result<List<Value>, ParseError<'_>> {
     }
 
     Ok(list)
+}
+
+fn parse_int(pair: Pair<'_, Rule>) -> Result<Value, ParseError<'_>> {
+    let s = pair.into_inner().next().ok_or(ParseError::Value)?.as_str();
+    let n: i64 = s
+        .parse()
+        .map_err(|err: std::num::ParseIntError| ParseError::Int(format!("value '{s}':\n{err}")))?;
+    Ok(Value::Int(n))
+}
+
+fn parse_float(pair: Pair<'_, Rule>) -> Result<Value, ParseError<'_>> {
+    let s = pair.into_inner().next().ok_or(ParseError::Value)?.as_str();
+    let n: f64 = s.parse().map_err(|err: std::num::ParseFloatError| {
+        ParseError::Float(format!("value '{s}':\n{err}"))
+    })?;
+    Ok(Value::Float(n))
 }
 
 #[cfg(test)]
@@ -200,5 +211,37 @@ mod tests {
                 )])
             })
         );
+    }
+
+    #[test]
+    fn test_numbers() {
+        let input = "int(30493093094)";
+        let input2 = "int(99999999999999999999999999999999)";
+
+        let p = SirtParser::parse(Rule::int, input).unwrap().next().unwrap();
+        let p2 = SirtParser::parse(Rule::int, input2)
+            .unwrap()
+            .next()
+            .unwrap();
+
+        assert_eq!(parse_int(p), Ok(Value::Int(30493093094)));
+        assert!(parse_int(p2).is_err());
+    }
+
+    #[test]
+    fn test_floats() {
+        let input = "float(12.0)";
+        let input2 = "float(0.)";
+        let parser = SirtParser::parse(Rule::float, input);
+        let parser2 = SirtParser::parse(Rule::float, input2);
+
+        assert!(parser.is_ok());
+        assert!(parser2.is_ok());
+
+        let p = parser.unwrap().into_iter().next().unwrap();
+        let p2 = parser2.unwrap().into_iter().next().unwrap();
+
+        assert_eq!(parse_float(p), Ok(Value::Float(12.0)));
+        assert_eq!(parse_float(p2), Ok(Value::Float(0.0)))
     }
 }

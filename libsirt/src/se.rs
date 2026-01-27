@@ -118,6 +118,11 @@ impl<'a> ser::Serializer for &'a mut SirtSerializer {
         Ok(())
     }
 
+    fn serialize_f64(self, v: f64) -> Result<Self::Ok, Self::Error> {
+        self.output.push_str(&format!("float({v})"));
+        Ok(())
+    }
+
     fn serialize_str(self, v: &str) -> Result<Self::Ok, Self::Error> {
         self.output.push_str(&format!("text(\"{v}\")"));
         Ok(())
@@ -189,10 +194,6 @@ impl<'a> ser::Serializer for &'a mut SirtSerializer {
     }
 
     fn serialize_f32(self, _: f32) -> Result<Self::Ok, Self::Error> {
-        unimplemented!()
-    }
-
-    fn serialize_f64(self, _: f64) -> Result<Self::Ok, Self::Error> {
         unimplemented!()
     }
 
