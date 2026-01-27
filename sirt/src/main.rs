@@ -8,7 +8,12 @@ use color_eyre::{
     Result, Section, SectionExt,
     eyre::{ensure, eyre},
 };
-use libsirt::{Block, parse_input};
+use libsirt::{
+    Block,
+    error::ParseError,
+    parse_input,
+    types::{Float, Int},
+};
 
 use crate::cli::{Sirt, SirtCommand, Using};
 
@@ -33,7 +38,15 @@ fn main() -> Result<()> {
                 Err(err) => {
                     return Err(eyre!("Error returned during parsing")
                         .with_section(|| err.to_string().header("Parse Error:"))
-                        .suggestion("Check for syntax errors and try again"));
+                        .with_note(|| match err {
+                            ParseError::Bool(_) => {
+                                "supported boolean values: [true, false, yes, no]".to_string()
+                            }
+                            ParseError::Int(_) => {
+                                format!("int must be between {} and {}", Int::MIN, Int::MAX)
+                            }
+                            d => format!("Check for syntax errors and try again: {d}"),
+                        }));
                 }
             }
         }
@@ -52,7 +65,18 @@ fn main() -> Result<()> {
                 Err(err) => {
                     return Err(eyre!("Error returned during parsing")
                         .with_section(|| err.to_string().header("Parse Error:"))
-                        .suggestion("Check for syntax errors and try again"));
+                        .with_note(|| match err {
+                            ParseError::Bool(_) => {
+                                "supported boolean values: [true, false, yes, no]".to_string()
+                            }
+                            ParseError::Int(_) => {
+                                format!("int must be between {} and {}", Int::MIN, Int::MAX)
+                            }
+                            ParseError::Float(_) => {
+                                format!("float must be between {} and {}", Float::MIN, Float::MAX)
+                            }
+                            _ => "Check for syntax errors and try again".to_owned(),
+                        }));
                 }
             }
         }
