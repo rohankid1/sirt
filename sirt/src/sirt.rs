@@ -63,7 +63,7 @@ pub fn repr_block(block: &Block) -> String {
     output.push_str(&format!("struct {} {{\n", block.get_name()));
     for (name, value) in block.get_fields() {
         let value = infer_type_str(value);
-        output.push_str(&format!("    {name}: {value}"));
+        output.push_str(&format!("    {name}: {value},"));
         output.push('\n');
     }
     output.push('}');
