@@ -28,14 +28,12 @@ struct App {
     blocks: Vec<BlockItem>,
     repr_editor: text_editor::Content,
     syntax_editor: text_editor::Content,
-    picked_theme: Option<Theme>,
 }
 
 impl Default for App {
     fn default() -> Self {
         Self {
             theme: Theme::CatppuccinMacchiato,
-            picked_theme: None,
             blocks: vec![],
             repr_editor: text_editor::Content::new(),
             syntax_editor: text_editor::Content::new(),
@@ -129,12 +127,8 @@ impl App {
         let nav = row![
             button("Exit").on_press(Message::Exit),
             widget::space().width(Length::Fill),
-            pick_list(Theme::ALL, self.picked_theme.as_ref(), Message::SetTheme).placeholder(
-                self.picked_theme
-                    .as_ref()
-                    .map(|t| t.to_string())
-                    .unwrap_or("Theme".to_string())
-            )
+            pick_list(Theme::ALL, Some(&self.theme), Message::SetTheme)
+                .placeholder(self.theme.to_string())
         ]
         .padding(10);
 
@@ -150,6 +144,9 @@ impl App {
             })
             .collect();
 
+        let program_version = env!("CARGO_PKG_VERSION");
+        let program_name = "sirt analyzer";
+
         let side_bar = container(column![
             text("Blocks").size(30.0).font(Font {
                 weight: Weight::Bold,
@@ -157,7 +154,14 @@ impl App {
             }),
             scrollable(Column::from_vec(elements).spacing(12))
                 .width(Fill)
-                .height(Fill)
+                .height(Fill),
+            container(
+                text(format!("{program_name} - {program_version}"))
+                    .size(15.0)
+                    .align_x(widget::text::Alignment::Center),
+            )
+            .center_x(Fill)
+            .padding(Padding::default().bottom(10).top(10))
         ])
         .padding(Padding::default().left(10))
         .width(FillPortion(1))
