@@ -1963,7 +1963,7 @@ dependencies = [
 
 [[package]]
 name = "libsirt"
-version = "0.2.0"
+version = "0.4.0"
 dependencies = [
  "pest",
  "pest_derive",
@@ -3424,7 +3424,7 @@ checksum = "56199f7ddabf13fe5074ce809e7d3f42b42ae711800501b5b16ea82ad029c39d"
 
 [[package]]
 name = "sirt"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "clap",
  "color-eyre",
