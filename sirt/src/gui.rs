@@ -144,6 +144,9 @@ impl App {
             })
             .collect();
 
+        let program_version = env!("CARGO_PKG_VERSION");
+        let program_name = "sirt analyzer";
+
         let side_bar = container(column![
             text("Blocks").size(30.0).font(Font {
                 weight: Weight::Bold,
@@ -151,7 +154,14 @@ impl App {
             }),
             scrollable(Column::from_vec(elements).spacing(12))
                 .width(Fill)
-                .height(Fill)
+                .height(Fill),
+            container(
+                text(format!("{program_name} - {program_version}"))
+                    .size(15.0)
+                    .align_x(widget::text::Alignment::Center),
+            )
+            .center_x(Fill)
+            .padding(Padding::default().bottom(10).top(10))
         ])
         .padding(Padding::default().left(10))
         .width(FillPortion(1))
