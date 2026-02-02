@@ -1,7 +1,12 @@
 [package]
 name = "sirt"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
+license = "MIT or Apache-2.0"
+description = "GUI or TUI analyzer for libsirt"
+homepage = "https://github.com/rohankid1/sirt"
+repository = "https://github.com/rohankid1/sirt"
+readme = "README.md"
 
 [dependencies]
 libsirt = { path = "../libsirt" }
