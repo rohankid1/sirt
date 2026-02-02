@@ -4,6 +4,7 @@ use iced::{
     Length::{self, Fill, FillPortion},
     Padding, Task, Theme,
     font::Weight,
+    highlighter::Theme as HighlighterTheme,
     widget::{
         self, Column, button, column, container, pick_list, row, scrollable, text,
         text_editor::{self, Action, Edit},
@@ -19,12 +20,14 @@ enum Message {
     Edit(Action),
     EditSyn(Action),
     SetTheme(Theme),
+    SetSyntaxTheme(HighlighterTheme),
     ChooseBlock(usize),
 }
 
 #[derive(Debug, Clone)]
 struct App {
     theme: Theme,
+    highlighter: HighlighterTheme,
     blocks: Vec<BlockItem>,
     repr_editor: text_editor::Content,
     syntax_editor: text_editor::Content,
@@ -34,6 +37,7 @@ impl Default for App {
     fn default() -> Self {
         Self {
             theme: Theme::CatppuccinMacchiato,
+            highlighter: HighlighterTheme::SolarizedDark,
             blocks: vec![],
             repr_editor: text_editor::Content::new(),
             syntax_editor: text_editor::Content::new(),
@@ -84,6 +88,9 @@ impl App {
             Message::SetTheme(theme) => {
                 self.theme = theme;
             }
+            Message::SetSyntaxTheme(theme) => {
+                self.highlighter = theme;
+            }
             Message::Exit => return iced::exit(),
             Message::CopyCode => {
                 return iced::clipboard::write(self.repr_editor.text().trim().to_string());
@@ -124,13 +131,35 @@ impl App {
     }
 
     fn view(&self) -> Element<'_, Message> {
-        let nav = row![
-            button("Exit").on_press(Message::Exit),
-            widget::space().width(Length::Fill),
-            pick_list(Theme::ALL, Some(&self.theme), Message::SetTheme)
-                .placeholder(self.theme.to_string())
+        let nav = column![
+            row![
+                button("Exit").on_press(Message::Exit),
+                widget::space().width(Length::Fill),
+                container(
+                    row![
+                        column![
+                            text("Theme"),
+                            pick_list(Theme::ALL, Some(&self.theme), Message::SetTheme)
+                                .placeholder(self.theme.to_string()),
+                        ]
+                        .spacing(2.5),
+                        column![
+                            text("Highligher"),
+                            pick_list(
+                                HighlighterTheme::ALL,
+                                Some(&self.highlighter),
+                                Message::SetSyntaxTheme
+                            ),
+                        ]
+                        .spacing(2.5)
+                    ]
+                    .spacing(10)
+                ),
+            ]
+            .padding(10),
+            colored_border()
         ]
-        .padding(10);
+        .padding(Padding::default().bottom(5));
 
         let elements: Vec<Element<'_, Message>> = self
             .blocks
@@ -178,11 +207,13 @@ impl App {
                 widget::text_editor(&self.repr_editor)
                     .font(iced::Font::MONOSPACE)
                     .on_action(Message::Edit)
-                    .height(Length::Fill),
+                    .height(Length::Fill)
+                    .highlight("rust", self.highlighter),
                 widget::text_editor(&self.syntax_editor)
                     .font(iced::Font::MONOSPACE)
                     .on_action(Message::EditSyn)
                     .height(Length::Fill)
+                    .highlight("rust", self.highlighter)
             ]
             .spacing(5),
         )
@@ -191,6 +222,16 @@ impl App {
 
         container(column![nav, row![side_bar, editors]]).into()
     }
+}
+
+fn colored_border<'a>() -> widget::Container<'a, Message> {
+    container(widget::space::horizontal())
+        .height(1.0)
+        .style(move |theme: &Theme| {
+            widget::container::background(iced::Background::from(
+                theme.extended_palette().primary.base.color,
+            ))
+        })
 }
 
 pub fn run(blocks: Vec<crate::Block>) -> iced::Result {
